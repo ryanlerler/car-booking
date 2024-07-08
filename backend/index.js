@@ -28,13 +28,7 @@ const BookingController = require("./controllers/bookingController");
 const bookingController = new BookingController(booking, user, car);
 const bookingRouter = new BookingRouter(bookingController, checkJwt).routes();
 
-const allowedOrigins = [process.env.FRONTEND];
-
-const corsOptions = {
-  origin: allowedOrigins,
-};
-
-const app = express(corsOptions);
+const app = express();
 
 app.use(cors());
 
@@ -45,6 +39,6 @@ app.use("/users", userRouter);
 app.use("/cars", carRouter);
 app.use("/bookings", bookingRouter);
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Express app listening on port ${PORT}!`);
 });

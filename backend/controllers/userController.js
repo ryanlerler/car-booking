@@ -6,13 +6,14 @@ class UserController extends BaseController {
   }
 
   getOne = async (req, res) => {
-    const { userId } = req.params;
+    const { email } = req.params;
     try {
       const user = await this.model.findOne({
         where: {
-          useruserId,
+          email,
         },
       });
+      console.log(user);
       return res.json(user);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
@@ -36,31 +37,6 @@ class UserController extends BaseController {
         },
       });
       return res.json(user);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err.message });
-    }
-  };
-
-  updateProfile = async (req, res) => {
-    const { email, name, profilePicUrl, contactNo, isAdmin } = req.body;
-
-    const { userId } = req.params;
-
-    try {
-      const userToEdit = await this.model.findOne({
-        where: {
-          userId,
-        },
-      });
-
-      const updatedUser = await userToEdit.update({
-        email,
-        name,
-        profilePicUrl,
-        contactNo,
-        isAdmin,
-      });
-      return res.json(updatedUser);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
     }

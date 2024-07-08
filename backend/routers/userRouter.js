@@ -8,10 +8,9 @@ class UserRouter {
   }
 
   routes = () => {
-    router.get("/", this.checkJwt, this.controller.getAll);
-    router.get("/:userId", this.checkJwt, this.controller.getOne);
+    router.get("/", this.controller.getAll);
+    router.get("/:email", this.controller.getOne);
     router.post("/", this.controller.signUp);
-    router.put("/:userId", this.checkJwt, this.controller.updateProfile);
     return router;
   };
 }

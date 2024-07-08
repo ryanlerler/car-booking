@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 const BaseController = require("./baseController");
 
 class BookingController extends BaseController {
@@ -8,13 +10,18 @@ class BookingController extends BaseController {
   }
 
   getAll = async (req, res) => {
+    const { userId } = req.params;
+
     try {
       const data = await this.model.findAll({
+        where: {
+          userId,
+        },
         include: [this.userModel, this.carModel],
       });
       return res.json(data);
     } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+      return res.status(400).json({ error: true, msg: err.message });
     }
   };
 
@@ -32,14 +39,72 @@ class BookingController extends BaseController {
 
   addBooking = async (req, res) => {
     const { userId, carId, startDate, endDate } = req.body;
+
     try {
+      const startDateTime = new Date(startDate);
+      const endDateTime = new Date(endDate);
+
+      const overlappingBookings = await this.model.findAll({
+        where: {
+          carId,
+          [Op.or]: [
+            {
+              startDate: {
+                [Op.between]: [startDateTime, endDateTime],
+              },
+            },
+            {
+              endDate: {
+                [Op.between]: [startDateTime, endDateTime],
+              },
+            },
+            {
+              [Op.and]: [
+                {
+                  startDate: {
+                    [Op.lte]: startDateTime,
+                  },
+                },
+                {
+                  endDate: {
+                    [Op.gte]: endDateTime,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      if (overlappingBookings.length > 0) {
+        return res.status(400).json({
+          error: true,
+          msg: "Car is already booked for the selected dates.",
+        });
+      }
+
       const newBooking = await this.model.create({
         userId,
         carId,
-        startDate,
-        endDate,
+        startDate: startDateTime,
+        endDate: endDateTime,
       });
-      return res.json(newBooking);
+
+      const bookingWithDetails = await this.model.findOne({
+        where: { id: newBooking.id },
+        include: [
+          {
+            model: this.userModel,
+            as: "user",
+          },
+          {
+            model: this.carModel,
+            as: "car",
+          },
+        ],
+      });
+
+      return res.json(bookingWithDetails);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
     }
