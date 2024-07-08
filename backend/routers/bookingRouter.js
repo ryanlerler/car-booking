@@ -10,9 +10,9 @@ class BookingRouter {
   routes = () => {
     router.get("/", this.controller.getAll);
     router.get("/:bookingId", this.controller.getOne);
-    // router.post("/", this.checkJwt, this.controller.addBooking);
-    // router.put("/:bookingId", this.checkJwt, this.controller.updateBooking);
-    // router.delete("/:bookingId", this.checkJwt, this.controller.deleteBooking);
+    router.post("/", this.controller.addBooking);
+    router.put("/:bookingId", this.controller.updateBooking);
+    router.delete("/:bookingId", this.controller.deleteBooking);
     return router;
   };
 }
