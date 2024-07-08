@@ -1,35 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from "react-router-dom";
+import "./App.css";
+import { useEffect, useState, createContext } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
+import ScrollToTop from "react-scroll-to-top";
+import Home from "./pages/Home";
+import BookingsForm from "./pages/BookingsForm";
+import EditBookingForm from "./pages/EditBookingForm";
+import CustomNavbar from "./components/CustomNavbar";
+import AddCarForm from "./pages/AddCarForm";
+import ManageBookings from "./pages/ManageBookings";
+
+export const UserContext = createContext();
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [car, setCar] = useState({});
+  const [loggedInUser, setLoggedInUser] = useState({});
+  const { user, getAccessTokenSilently } = useAuth0();
+  const value = { loggedInUser, setLoggedInUser };
+
+  console.log(loggedInUser);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/${user?.email}`
+      );
+      if (data) {
+        setLoggedInUser(data);
+      }
+    };
+
+    if (user) {
+      fetchUser();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUDIENCE,
+          scope: "read:current_user",
+        },
+      });
+
+      localStorage.setItem("token", token);
+    };
+
+    if (user) {
+      fetchToken();
+    }
+  }, [getAccessTokenSilently, user?.sub]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <header className="App-header">
+        <UserContext.Provider value={value}>
+          <ScrollToTop color="black" width="20" height="20" />
+
+          <CustomNavbar />
+
+          <Routes>
+            <Route index element={<Home />} />
+
+            <Route path="/bookings-form" element={<BookingsForm />} />
+
+            <Route
+              path="/bookings-form/:bookingId/update"
+              element={<EditBookingForm cars={car} setCars={setCar} />}
+            />
+
+            <Route path="/manage-bookings" element={<ManageBookings />} />
+
+            <Route path="/add-car" element={<AddCarForm />} />
+          </Routes>
+        </UserContext.Provider>
+      </header>
+    </div>
+  );
 }
 
-export default App
+export default App;

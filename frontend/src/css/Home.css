@@ -1,0 +1,34 @@
+.files-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  overflow: hidden;
+}
+
+.files {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.footer-container {
+  margin-top: 20px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+
+.card {
+  border-radius: 50px;
+  margin: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.card-title {
+  height: 3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
