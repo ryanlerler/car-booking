@@ -6,6 +6,17 @@ class CarController extends BaseController {
     this.bookingModel = bookingModel;
   }
 
+  getAll = async (req, res) => {
+    try {
+      const data = await this.model.findAll({
+        include: [this.bookingModel],
+      });
+      return res.json(data);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err.message });
+    }
+  };
+
   getOne = async (req, res) => {
     const { carId } = req.params;
     try {
