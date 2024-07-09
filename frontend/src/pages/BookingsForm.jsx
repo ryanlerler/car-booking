@@ -11,6 +11,9 @@ import {
 } from "react-bootstrap";
 import ConfirmationPage from "../components/ConfirmationPage";
 import { UserContext } from "../App";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { addDays, eachDayOfInterval, parseISO } from "date-fns";
 
 export default function BookingsForm() {
   const [cars, setCars] = useState([]);
@@ -54,6 +57,23 @@ export default function BookingsForm() {
       alert("Car is already booked for the selected dates!");
       console.error("Error submitting booking:", error);
     }
+  };
+
+  const getExcludedDates = () => {
+    if (!selectedCar || !selectedCar.bookings) return [];
+    let excludedDates = [];
+    selectedCar.bookings.forEach((booking) => {
+      const startDate = parseISO(booking.startDate);
+      const endDate = parseISO(booking.endDate);
+      const interval = eachDayOfInterval({
+        start: startDate,
+        end: endDate,
+      });
+      // console.log(interval);
+      excludedDates = excludedDates.concat(interval);
+    });
+    console.log(excludedDates)
+    return excludedDates;
   };
 
   if (bookingConfirmed) {
@@ -108,15 +128,14 @@ export default function BookingsForm() {
                 Start Date:
               </Form.Label>
               <Col sm="8">
-                <Form.Control
-                  type="date"
-                  value={bookingDates.startDate}
-                  onChange={(e) =>
-                    setBookingDates({
-                      ...bookingDates,
-                      startDate: e.target.value,
-                    })
+                <DatePicker
+                  selected={bookingDates.startDate}
+                  onChange={(date) =>
+                    setBookingDates({ ...bookingDates, startDate: date })
                   }
+                  minDate={new Date()}
+                  excludeDates={getExcludedDates()}
+                  dateFormat="yyyy-MM-dd"
                   required
                 />
               </Col>
@@ -127,15 +146,14 @@ export default function BookingsForm() {
                 End Date:
               </Form.Label>
               <Col sm="8">
-                <Form.Control
-                  type="date"
-                  value={bookingDates.endDate}
-                  onChange={(e) =>
-                    setBookingDates({
-                      ...bookingDates,
-                      endDate: e.target.value,
-                    })
+                <DatePicker
+                  selected={bookingDates.endDate}
+                  onChange={(date) =>
+                    setBookingDates({ ...bookingDates, endDate: date })
                   }
+                  minDate={bookingDates.startDate || new Date()}
+                  excludeDates={getExcludedDates()}
+                  dateFormat="yyyy-MM-dd"
                   required
                 />
               </Col>
