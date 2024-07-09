@@ -2,10 +2,13 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { Table, Image } from "react-bootstrap";
 import { UserContext } from "../App";
+import { formatInTimeZone } from "date-fns-tz";
 
 export default function ManageBookings() {
   const [bookings, setBookings] = useState([]);
   const value = useContext(UserContext);
+
+  const timeZone = "Singapore";
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -68,8 +71,20 @@ export default function ManageBookings() {
                   <td>{booking.car.seatCount}</td>
                   <td>{booking.car.makeYear}</td>
                   <td>{booking.car.vehicleNo}</td>
-                  <td>{booking.startDate}</td>
-                  <td>{booking.endDate}</td>
+                  <td>
+                    {formatInTimeZone(
+                      booking.startDate,
+                      timeZone,
+                      "yyyy-MM-dd HH:mm:ssXXX"
+                    )}
+                  </td>
+                  <td>
+                    {formatInTimeZone(
+                      booking.endDate,
+                      timeZone,
+                      "yyyy-MM-dd HH:mm:ssXXX"
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
