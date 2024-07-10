@@ -1,4 +1,5 @@
 const BaseController = require("./baseController");
+const { Op } = require("sequelize");
 
 class CarController extends BaseController {
   constructor(model, bookingModel) {
@@ -12,6 +13,68 @@ class CarController extends BaseController {
         include: [this.bookingModel],
       });
       return res.json(data);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err.message });
+    }
+  };
+
+  getAvailableCars = async (req, res) => {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res
+        .status(400)
+        .json({ error: true, msg: "Start date and end date are required." });
+    }
+
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+
+    console.log(startDateTime);
+    console.log(endDateTime);
+
+    try {
+      const cars = await this.model.findAll({
+        include: [
+          {
+            model: this.bookingModel,
+            where: {
+              [Op.or]: [
+                {
+                  startDate: {
+                    [Op.between]: [startDateTime, endDateTime],
+                  },
+                },
+                {
+                  endDate: {
+                    [Op.between]: [startDateTime, endDateTime],
+                  },
+                },
+                {
+                  [Op.and]: [
+                    {
+                      startDate: {
+                        [Op.lte]: startDateTime,
+                      },
+                    },
+                    {
+                      endDate: {
+                        [Op.gte]: endDateTime,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+            required: false,
+          },
+        ],
+      });
+
+      // Filter out cars that have bookings in the specified date range
+      const availableCars = cars.filter((car) => car.bookings.length === 0);
+
+      return res.json(availableCars);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
     }

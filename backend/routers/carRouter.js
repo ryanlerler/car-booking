@@ -9,6 +9,7 @@ class CarRouter {
 
   routes = () => {
     router.get("/", this.controller.getAll);
+    router.get("/available-cars", this.controller.getAvailableCars);
     router.get("/:carId", this.controller.getOne);
     router.post("/", this.checkJwt, this.controller.addCar);
     // router.put("/:carId", this.checkJwt, this.controller.updateCar);
