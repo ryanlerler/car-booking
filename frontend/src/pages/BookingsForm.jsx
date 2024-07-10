@@ -163,8 +163,8 @@ export default function BookingsForm() {
               </Col>
 
               <h6>
-                DISCLAIMER: You may extend the end date later , but changing the
-                car or shortening the booking period after booking is{" "}
+                DISCLAIMER: You may extend the end date later, but changing the
+                car or shortening/ delaying the booking period after booking is{" "}
                 <strong>NOT</strong> allowed!
               </h6>
             </Form.Group>
