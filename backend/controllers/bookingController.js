@@ -29,8 +29,23 @@ class BookingController extends BaseController {
     const { bookingId } = req.params;
     try {
       const booking = await this.model.findByPk(bookingId, {
-        include: [this.userModel, this.carModel],
+        include: [
+          {
+            model: this.userModel,
+          },
+          {
+            model: this.carModel,
+            include: [
+              {
+                model: this.model,
+              },
+            ],
+          },
+        ],
       });
+      if (!booking) {
+        return res.status(404).json({ error: true, msg: "Booking not found" });
+      }
       return res.json(booking);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
@@ -112,16 +127,63 @@ class BookingController extends BaseController {
 
   updateBooking = async (req, res) => {
     const { bookingId } = req.params;
-    const { userId, carId, startDate, endDate } = req.body;
+    const { startDate, endDate } = req.body;
 
     try {
       const bookingToUpdate = await this.model.findByPk(bookingId);
 
+      if (!bookingToUpdate) {
+        return res.status(404).json({ error: true, msg: "Booking not found" });
+      }
+
+      const carId = bookingToUpdate.carId;
+
+      const startDateTime = new Date(startDate);
+      const endDateTime = new Date(endDate);
+
+      const overlappingBookings = await this.model.findAll({
+        where: {
+          carId,
+          id: { [Op.ne]: bookingId }, // Exclude the current booking
+          [Op.or]: [
+            {
+              startDate: {
+                [Op.between]: [startDateTime, endDateTime],
+              },
+            },
+            {
+              endDate: {
+                [Op.between]: [startDateTime, endDateTime],
+              },
+            },
+            {
+              [Op.and]: [
+                {
+                  startDate: {
+                    [Op.lte]: startDateTime,
+                  },
+                },
+                {
+                  endDate: {
+                    [Op.gte]: endDateTime,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      if (overlappingBookings.length > 0) {
+        return res.status(400).json({
+          error: true,
+          msg: "Car is already booked for the selected dates.",
+        });
+      }
+
       const updatedBooking = await bookingToUpdate.update({
-        userId,
-        carId,
-        startDate,
-        endDate,
+        startDate: startDateTime,
+        endDate: endDateTime,
       });
       return res.json(updatedBooking);
     } catch (err) {
@@ -134,6 +196,10 @@ class BookingController extends BaseController {
 
     try {
       const bookingToDelete = await this.model.findByPk(bookingId);
+
+      if (!bookingToDelete) {
+        return res.status(404).json({ error: true, msg: "Booking not found" });
+      }
 
       await bookingToDelete.destroy();
       return res.json({

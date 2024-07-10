@@ -13,7 +13,9 @@ class UserController extends BaseController {
           email,
         },
       });
-      console.log(user);
+      if (!user) {
+        return res.status(404).json({ error: true, msg: "User not found" });
+      }
       return res.json(user);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });

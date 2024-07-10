@@ -8,6 +8,7 @@ class BookingRouter {
   }
 
   routes = () => {
+    router.use(this.checkJwt);
     router.get("/users/:userId", this.controller.getAll);
     router.get("/:bookingId", this.controller.getOne);
     router.post("/", this.controller.addBooking);

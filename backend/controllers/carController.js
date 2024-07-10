@@ -23,6 +23,9 @@ class CarController extends BaseController {
       const car = await this.model.findByPk(carId, {
         include: [this.bookingModel],
       });
+      if (!car) {
+        return res.status(404).json({ error: true, msg: "Car not found" });
+      }
       return res.json(car);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
