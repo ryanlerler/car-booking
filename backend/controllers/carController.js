@@ -31,6 +31,17 @@ class CarController extends BaseController {
       return res.status(400).json({ error: true, msg: err.message });
     }
   };
+
+  addCar = async (req, res) => {
+    try {
+      const newCar = await this.model.create({
+        ...req.body,
+      });
+      return res.json(newCar);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err.message });
+    }
+  };
 }
 
 module.exports = CarController;
