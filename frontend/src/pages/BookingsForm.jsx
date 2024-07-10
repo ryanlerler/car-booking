@@ -13,7 +13,7 @@ import ConfirmationPage from "../components/ConfirmationPage";
 import { UserContext } from "../App";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addDays, eachDayOfInterval, parseISO } from "date-fns";
+import { eachDayOfInterval, parseISO } from "date-fns";
 
 export default function BookingsForm() {
   const [cars, setCars] = useState([]);
@@ -25,6 +25,7 @@ export default function BookingsForm() {
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
   const value = useContext(UserContext);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,11 +48,16 @@ export default function BookingsForm() {
     };
 
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/bookings`,
-        bookingData
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      setBookingDetails(response.data);
+      setBookingDetails(data);
       setBookingConfirmed(true);
     } catch (error) {
       alert("Car is already booked for the selected dates!");
@@ -69,10 +75,8 @@ export default function BookingsForm() {
         start: startDate,
         end: endDate,
       });
-      // console.log(interval);
       excludedDates = excludedDates.concat(interval);
     });
-    console.log(excludedDates)
     return excludedDates;
   };
 
@@ -82,7 +86,7 @@ export default function BookingsForm() {
 
   return (
     <Container>
-      <h1 className="mt-3">Book a Car</h1>
+      <h2 className="mt-3">Book a Car</h2>
       <Row className="mt-3">
         <Col md={6}>
           <Form onSubmit={handleSubmit}>
@@ -157,6 +161,12 @@ export default function BookingsForm() {
                   required
                 />
               </Col>
+
+              <h6>
+                DISCLAIMER: You may extend the end date later , but changing the
+                car or shortening the booking period after booking is{" "}
+                <strong>NOT</strong> allowed!
+              </h6>
             </Form.Group>
 
             <Button type="submit">Submit Booking</Button>

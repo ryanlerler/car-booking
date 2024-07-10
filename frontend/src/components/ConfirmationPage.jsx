@@ -45,6 +45,10 @@ export default function ConfirmationPage({ bookingDetails }) {
                   <Card.Text>
                     <strong>Vehicle No:</strong> {bookingDetails.car.vehicleNo}
                   </Card.Text>
+                  <Card.Text>
+                    <strong>Rental Period:</strong> {formattedStartDate} to{" "}
+                    {formattedEndDate}
+                  </Card.Text>
                 </Col>
                 <Col xs={6}>
                   <Card.Text>
@@ -57,13 +61,25 @@ export default function ConfirmationPage({ bookingDetails }) {
                     <strong>Rental Rate:</strong> $
                     {bookingDetails.car.pricePerDay}/day
                   </Card.Text>
+                  <Card.Text>
+                    <strong>Power:</strong> {bookingDetails.car.power}
+                  </Card.Text>
+                  <Card.Text>
+                    <strong>Type:</strong> {bookingDetails.car.type}
+                  </Card.Text>
+                  <Card.Text>
+                    <strong>Seat Count:</strong> {bookingDetails.car.seatCount}
+                  </Card.Text>
+                  <Card.Text>
+                    <strong>Make Year:</strong> {bookingDetails.car.makeYear}
+                  </Card.Text>
                 </Col>
               </Row>
-              <Card.Text>
-                <strong> Rental Period:</strong> {formattedStartDate} to{" "}
-                {formattedEndDate}
-              </Card.Text>
-              <Button variant="primary" onClick={handleRefresh}>
+              <Button
+                variant="primary"
+                onClick={handleRefresh}
+                className="mt-3"
+              >
                 Book Another Car
               </Button>
             </Col>
@@ -73,5 +89,3 @@ export default function ConfirmationPage({ bookingDetails }) {
     </Container>
   );
 }
-
-// Todo: wrong timezone in confirmation/ bookings management; edit start/end dates; delete booking; find out how to implement admin role then admin to crud new car; Implement additional filters (like car type, price range) on the home page to improve user search capability.

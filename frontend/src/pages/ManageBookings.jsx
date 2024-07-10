@@ -1,14 +1,17 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Table, Image } from "react-bootstrap";
+import { Table, Image, Button } from "react-bootstrap";
 import { UserContext } from "../App";
 import { formatInTimeZone } from "date-fns-tz";
+import { useNavigate } from "react-router-dom";
 
 export default function ManageBookings() {
   const [bookings, setBookings] = useState([]);
   const value = useContext(UserContext);
+  const navigate = useNavigate();
 
   const timeZone = "Singapore";
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -16,7 +19,12 @@ export default function ManageBookings() {
         const { data } = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/bookings/users/${
             value.loggedInUser.id
-          }`
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setBookings(data);
       } catch (error) {
@@ -27,9 +35,25 @@ export default function ManageBookings() {
     fetchBookings();
   }, [value.loggedInUser.id]);
 
+  const handleDelete = async (bookingId) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/${bookingId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setBookings(bookings.filter((booking) => booking.id !== bookingId));
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+    }
+  };
+
   return (
     <div>
-      <h1 className="mt-3">Manage Bookings</h1>
+      <h2 className="mt-3">Manage Bookings</h2>
       <div>
         {bookings.length === 0 ? (
           <p>No bookings found.</p>
@@ -49,6 +73,7 @@ export default function ManageBookings() {
                 <th>Vehicle No</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -75,15 +100,26 @@ export default function ManageBookings() {
                     {formatInTimeZone(
                       booking.startDate,
                       timeZone,
-                      "yyyy-MM-dd HH:mm:ssXXX"
+                      "yyyy-MM-dd"
                     )}
                   </td>
                   <td>
-                    {formatInTimeZone(
-                      booking.endDate,
-                      timeZone,
-                      "yyyy-MM-dd HH:mm:ssXXX"
-                    )}
+                    {formatInTimeZone(booking.endDate, timeZone, "yyyy-MM-dd")}
+                  </td>
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={() => navigate(`/edit-booking/${booking.id}`)}
+                      className="me-2"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDelete(booking.id)}
+                    >
+                      Delete
+                    </Button>
                   </td>
                 </tr>
               ))}

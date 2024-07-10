@@ -25,19 +25,15 @@ export default function Home() {
           ? cars.map((car) => (
               <Col key={car.id}>
                 <Card className="card">
-                  <Link to={`/cars/${car.id}`}>
-                    <div className="files-container">
-                      <Card.Img
-                        src={car.imageUrl}
-                        alt="file"
-                        className="files"
-                      />
-                    </div>
-                  </Link>
+                  <div className="files-container">
+                    <Card.Img src={car.imageUrl} alt="file" className="files" />
+                  </div>
 
                   <Card.Body>
                     <Card.Title className="card-title">
-                      <strong>{car.make} {car.model}</strong>
+                      <strong>
+                        {car.make} {car.model}
+                      </strong>
                       <br />
                     </Card.Title>
 

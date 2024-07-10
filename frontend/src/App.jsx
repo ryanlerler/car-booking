@@ -67,7 +67,7 @@ function App() {
             <Route path="/bookings-form" element={<BookingsForm />} />
 
             <Route
-              path="/bookings-form/:bookingId/update"
+              path="/edit-booking/:bookingId"
               element={<EditBookingForm cars={car} setCars={setCar} />}
             />
 
