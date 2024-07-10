@@ -14,9 +14,9 @@ import { UserContext } from "../App";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { eachDayOfInterval, parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 export default function BookingsForm() {
-  const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(null);
   const [bookingDates, setBookingDates] = useState({
     startDate: "",
@@ -26,17 +26,35 @@ export default function BookingsForm() {
   const [bookingDetails, setBookingDetails] = useState(null);
   const value = useContext(UserContext);
   const token = localStorage.getItem("token");
+  const [availableCars, setAvailableCars] = useState([]);
+  const timeZone = "Singapore";
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/cars`
-      );
-      setCars(data);
+    const fetchAvailableCars = async () => {
+      if (bookingDates.startDate && bookingDates.endDate) {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/cars/available-cars`,
+          {
+            params: {
+              startDate: formatInTimeZone(
+                bookingDates.startDate,
+                timeZone,
+                "yyyy-MM-dd"
+              ),
+              endDate: formatInTimeZone(
+                bookingDates.endDate,
+                timeZone,
+                "yyyy-MM-dd"
+              ),
+            },
+          }
+        );
+        setAvailableCars(data);
+      }
     };
 
-    fetchData();
-  }, []);
+    fetchAvailableCars();
+  }, [bookingDates]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,43 +110,6 @@ export default function BookingsForm() {
           <Form onSubmit={handleSubmit}>
             <Form.Group as={Row} className="mb-3">
               <Form.Label column sm="4">
-                Select Car:
-              </Form.Label>
-              <Col sm="8">
-                <Form.Control
-                  as="select"
-                  onChange={(e) =>
-                    setSelectedCar(
-                      cars.find((car) => car.id === parseInt(e.target.value))
-                    )
-                  }
-                  required
-                >
-                  <option value="">Select a car</option>
-                  {cars.map((car) => (
-                    <option key={car.id} value={car.id}>
-                      {car.make} {car.model} - ${car.pricePerDay}/day
-                    </option>
-                  ))}
-                </Form.Control>
-              </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm="4">
-                Customer Name:
-              </Form.Label>
-              <Col sm="8">
-                <Form.Control
-                  type="text"
-                  value={value.loggedInUser.name}
-                  readOnly
-                />
-              </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm="4">
                 Start Date:
               </Form.Label>
               <Col sm="8">
@@ -161,13 +142,54 @@ export default function BookingsForm() {
                   required
                 />
               </Col>
-
-              <h6>
-                DISCLAIMER: You may extend the end date later, but changing the
-                car or shortening/ delaying the booking period after booking is{" "}
-                <strong>NOT</strong> allowed!
-              </h6>
             </Form.Group>
+
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="4">
+                Select A Car:
+              </Form.Label>
+              <Col sm="8">
+                <Form.Control
+                  as="select"
+                  onChange={(e) =>
+                    setSelectedCar(
+                      availableCars.find(
+                        (car) => car.id === parseInt(e.target.value)
+                      )
+                    )
+                  }
+                  required
+                >
+                  {!(bookingDates.startDate && bookingDates.endDate) && (
+                    <option value="">Select Dates First</option>
+                  )}
+                  {availableCars.map((car) => (
+                    <option key={car.id} value={car.id}>
+                      {car.make} {car.model} - ${car.pricePerDay}/day
+                    </option>
+                  ))}
+                </Form.Control>
+              </Col>
+            </Form.Group>
+
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="4">
+                Customer Name:
+              </Form.Label>
+              <Col sm="8">
+                <Form.Control
+                  type="text"
+                  value={value.loggedInUser.name}
+                  readOnly
+                />
+              </Col>
+            </Form.Group>
+
+            <h6>
+              DISCLAIMER: You may extend the end date later, but changing the
+              car or shortening/ delaying the booking period after booking is{" "}
+              <strong>NOT</strong> allowed!
+            </h6>
 
             <Button type="submit">Submit Booking</Button>
           </Form>
@@ -195,6 +217,7 @@ export default function BookingsForm() {
                     <strong>Vehicle No:</strong> {selectedCar.vehicleNo}
                   </Col>
                 </Row>
+
                 <Image
                   src={selectedCar.imageUrl}
                   alt={`${selectedCar.make} ${selectedCar.model}`}
