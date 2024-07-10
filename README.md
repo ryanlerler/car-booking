@@ -10,40 +10,69 @@ View refers to application UI. MVC distinguishes between “view logic” and �
 
 Controller refers to the business logic. Controllers are the glue between the model and view, and handle HTTP requests and responses. For example, a controller would determine if, when and how an app would respond with a 404 error message. Controllers will contain the majority of out applications business logic, and generally everything not a model or view will go into a controller. 
 
+## ERD
+
+![Alt text]()
 
 ## Technologies used
 
 Programming Language: 
+
 Javascript
 
+
 Backend:
+
 Node.js runtime environment
+
 Express.js server
+
 PostgreSQL database
+
 Sequelize.js ORM
+
 Auth0 authentication
+
 
 Frontend:
+
 React + Vite
+
 date-fns + date-fns-tz for dates and timezone
+
 Firebase storage
+
 Auth0 authentication
 
+
 ## Potential improvements
+
 Admin role
+
 Admin to edit and delete car
+
 More filters
+
 Deployment (previous backend deployment platform I used is no longer free)
 
+
 ## To run the application
+
 git clone 'https://github.com/ryanlerler/fc-test.git'
 
 cd to backend
+
 set up environment variables as per .env.sample file
+
 npm i
+
 nodemon index.js
 
+
 cd to frontend
+
 set up environment variables as per .env.sample file
+
 npm i
+
 npm run dev
