@@ -15,9 +15,9 @@ Controller refers to the business logic. Controllers are the glue between the mo
 ## Technologies used
 
 Programming Language:
+
 Javascript
 
-<br>
 <br>
 Backend:
 
@@ -31,7 +31,6 @@ Sequelize.js ORM
 
 Auth0 authentication
 
-<br>
 <br>
 Frontend:
 
@@ -65,7 +64,6 @@ npm i
 
 nodemon index.js
 
-<br>
 <br>
 cd to frontend
 
