@@ -160,9 +160,7 @@ export default function BookingsForm() {
                   }
                   required
                 >
-                  {!(bookingDates.startDate && bookingDates.endDate) && (
-                    <option value="">Select Dates First</option>
-                  )}
+                  (<option value="">Select Dates First</option>)
                   {availableCars.map((car) => (
                     <option key={car.id} value={car.id}>
                       {car.make} {car.model} - ${car.pricePerDay}/day
