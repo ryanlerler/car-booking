@@ -1,10 +1,32 @@
-.files-container {
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.car-card {
+  transition: transform 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.car-card:hover {
+  transform: translateY(-5px);
+}
+
+.car-image-container {
   position: relative;
   padding-bottom: 56.25%;
   overflow: hidden;
 }
 
-.files {
+.car-image {
   position: absolute;
   top: 0;
   left: 0;
@@ -13,22 +35,23 @@
   object-fit: cover;
 }
 
-.footer-container {
-  margin-top: 20px;
-  padding: 20px;
-  border-top: 1px solid #ccc;
+.car-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
-.card {
-  border-radius: 50px;
-  margin: 10px;
-  overflow: hidden;
-  margin-top: 10px;
+footer {
+  margin-top: auto;
 }
 
-.card-title {
-  height: 3rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-form {
+    padding: 15px;
+  }
+
+  .car-card {
+    margin-bottom: 20px;
+  }
 }

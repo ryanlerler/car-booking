@@ -111,7 +111,7 @@ export default function EditBookingForm() {
 
   return (
     <Container>
-      <h1 className="mt-3">Edit Booking</h1>
+      <h2 className="mt-3">Edit Booking</h2>
       <Row className="mt-3">
         <Col md={6}>
           <Form onSubmit={handleSubmit}>
@@ -149,13 +149,8 @@ export default function EditBookingForm() {
               <Col sm="8">
                 <DatePicker
                   selected={bookingDates.startDate}
-                  onChange={(date) =>
-                    setBookingDates({ ...bookingDates, startDate: date })
-                  }
-                  minDate={new Date()}
-                  excludeDates={getExcludedDates()}
+                  readOnly
                   dateFormat="yyyy-MM-dd"
-                  required
                 />
               </Col>
             </Form.Group>
@@ -177,6 +172,13 @@ export default function EditBookingForm() {
                 />
               </Col>
             </Form.Group>
+
+            <h6>
+              DISCLAIMER: You may extend the end date to a later date here, but
+              changing of car, shortening end date to an earlier date, or
+              postponing the start date after booking is <strong>NOT</strong>{" "}
+              allowed!
+            </h6>
 
             <Button type="submit" variant="primary">
               Update Booking
