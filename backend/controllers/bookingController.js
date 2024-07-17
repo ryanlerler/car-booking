@@ -127,7 +127,7 @@ class BookingController extends BaseController {
 
   updateBooking = async (req, res) => {
     const { bookingId } = req.params;
-    const { startDate, endDate } = req.body;
+    const { endDate } = req.body;
 
     try {
       const bookingToUpdate = await this.model.findByPk(bookingId);
@@ -137,9 +137,16 @@ class BookingController extends BaseController {
       }
 
       const carId = bookingToUpdate.carId;
+      const currentStartDate = new Date(bookingToUpdate.startDate);
+      const currentEndDate = new Date(bookingToUpdate.endDate);
+      const newEndDate = new Date(endDate);
 
-      const startDateTime = new Date(startDate);
-      const endDateTime = new Date(endDate);
+      // Ensure the end date can only be extended
+      if (newEndDate <= currentEndDate) {
+        return res
+          .status(400)
+          .json({ error: true, msg: "End date can only be extended." });
+      }
 
       const overlappingBookings = await this.model.findAll({
         where: {
@@ -148,24 +155,24 @@ class BookingController extends BaseController {
           [Op.or]: [
             {
               startDate: {
-                [Op.between]: [startDateTime, endDateTime],
+                [Op.between]: [currentStartDate, newEndDate],
               },
             },
             {
               endDate: {
-                [Op.between]: [startDateTime, endDateTime],
+                [Op.between]: [currentStartDate, newEndDate],
               },
             },
             {
               [Op.and]: [
                 {
                   startDate: {
-                    [Op.lte]: startDateTime,
+                    [Op.lte]: currentStartDate,
                   },
                 },
                 {
                   endDate: {
-                    [Op.gte]: endDateTime,
+                    [Op.gte]: newEndDate,
                   },
                 },
               ],
@@ -182,9 +189,9 @@ class BookingController extends BaseController {
       }
 
       const updatedBooking = await bookingToUpdate.update({
-        startDate: startDateTime,
-        endDate: endDateTime,
+        endDate: newEndDate,
       });
+
       return res.json(updatedBooking);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err.message });
